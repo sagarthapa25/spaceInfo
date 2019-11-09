@@ -29,16 +29,16 @@ class HomeViewController: UIViewController {
         }
     }
     
+    @IBOutlet weak var reloadBtn: UIButton!{
+        didSet {
+            reloadBtn.isHidden = true
+            reloadBtn.addTarget(self, action: #selector(reload(_:)), for: .touchUpInside)
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "Rocket Launches"
-        let barButton = UIBarButtonItem(title: "Sort", style: .plain, target: self, action: #selector(sort(_:)))
-        let attrs = [
-            NSAttributedString.Key.foregroundColor: UIColor.black,
-            NSAttributedString.Key.font: UIFont(name: "Roboto-Medium", size: 18)!
-        ]
-        barButton.setTitleTextAttributes(attrs, for: .normal)
-        self.navigationItem.rightBarButtonItem = barButton
+        self.setupViews()
         self.fetchLaunches()
         
         
@@ -81,16 +81,34 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
 
 extension HomeViewController {
     
+    private func setupViews() {
+        self.title = "Rocket Launches"
+        let barButton = UIBarButtonItem(title: "Sort", style: .plain, target: self, action: #selector(sort(_:)))
+        let attrs = [
+            NSAttributedString.Key.foregroundColor: UIColor.black,
+            NSAttributedString.Key.font: UIFont(name: "Roboto-Medium", size: 18)!
+        ]
+        barButton.setTitleTextAttributes(attrs, for: .normal)
+        self.navigationItem.rightBarButtonItem = barButton
+    }
+    
     private func fetchLaunches() {
+        self.activityIndicatorView.startAnimating()
+        self.reloadBtn.isHidden = true
         spaceXClient.getLaunchList(of: Launches.self, from: URL(string: "https://api.spacexdata.com/v3/launches")!) { (result) in
             switch result {
             case .failure(let error):
                 self.hideIndicator()
+                
                 if error is DataError {
                     Logger.log(message: "DataError: \(error)", event: .i)
                     
                 } else {
                     Logger.log(message: "failure: \(error.localizedDescription)", event: .i)
+                }
+                DispatchQueue.main.async {
+                    self.reloadBtn.isHidden = false
+                    self.reloadBtn.setTitle("\(error) ,Tap to reload", for: .normal)
                 }
             case .success(let launches):
                 self.launches = launches
@@ -105,12 +123,19 @@ extension HomeViewController {
         }
     }
     
+    @objc private func reload(_ sender: UIButton) {
+        fetchLaunches()
+    }
+    
     func hideIndicator() {
         DispatchQueue.main.async {
             self.activityIndicatorView.stopAnimating()
         }
         
     }
+    
+
+    
     
     @objc func sort(_ sender: UIBarButtonItem) {
         self.showSortOptins()
