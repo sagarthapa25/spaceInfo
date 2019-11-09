@@ -11,6 +11,5 @@ Note: This app can be further improved by improving UI/UX. As right now the app 
 
 
 ## Design patterns
-In this project MVVM design pattren is used as it helps to keep the code organized. Furthermore the project is build in such a way
-it can be scaled easily if project grows. Model and 
+In this project MVVM design pattren is used as it helps to keep the code organized. Furthermore the project is build in such a way it can be scaled easily if project grows.
 

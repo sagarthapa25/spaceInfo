@@ -48,6 +48,7 @@ class APIClient {
     typealias result<T> = (Result<[T], Error>) -> Void
     typealias rocketResult<T> = (Result<T, Error>) -> Void
     
+    
     //MARK: - for array of object
     func getLaunchList<T: Decodable>(of type: T.Type, from url: URL, completion: @escaping result<T>) {
         
